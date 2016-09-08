@@ -1,1 +1,1 @@
-# Fadegal - Photo Gallery Carousel #
+# Fadegal - Universal lightweight JavaScript Slider/Carousel/Gallery/Navigator #
