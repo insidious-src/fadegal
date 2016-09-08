@@ -1,0 +1,25 @@
+.slideshow img
+{
+    width: 100%;
+}
+
+.slideshow .selected
+{
+    display: inline-block;
+}
+
+.thumbs img
+{
+    opacity: 0.6;
+    border-radius: 3px;
+}
+
+.thumbs img:hover
+{
+    opacity: 0.67;
+}
+
+.thumbs .selected
+{
+    opacity: 1.0;
+}

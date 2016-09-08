@@ -1,0 +1,19 @@
+#preview-image, #thumbnails
+{
+    width: 567px;
+}
+
+#preview-image
+{
+    height: 360px;
+}
+
+#thumbnails
+{
+    margin-top: 10px;
+}
+
+#thumbnails img
+{
+    width: 138px;
+}
