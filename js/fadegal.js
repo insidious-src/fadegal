@@ -35,7 +35,7 @@
         // Public Functions
         // ==========================================
 
-        self.getElementNum       = function()      { return m_gImgElements.length; }
+        self.getElementNum       = function()      { return m_gImgElements.length;       }
         self.getElementFromIndex = function(index) { return $(m_gImgElements).eq(index); }
 
         // ==========================================
@@ -49,26 +49,6 @@
         if (!m_gImgElements.length)
         {
             console.error("NO image data! Please, come back later after you watch some porn!");
-            return undefined;
-        }
-
-        if (self.navigatorFor != null &&
-            self.navigatorFor.getElementNum() != m_gImgElements.length)
-        {
-            console.error("CANNOT assign self as navigator");
-            return undefined;
-        }
-
-        // add change event callback
-        switch(self.itemChangeEvent)
-        {
-        case 'click': case 'dblclick': case 'hover':
-            $(self).on(self.itemChangeEvent, 'img', onChange);
-            break;
-        case '':
-            break;
-        default:
-            console.error("Wrong change event trigger!");
             return undefined;
         }
 
@@ -86,7 +66,7 @@
                 break;
             case 1:
                 $(this).css({ "position": "absolute", "top": "0px", "left": "0px" });
-                if (index == 0) $(this).show();
+                if (index == m_nCurIndex) $(this).show();
                 else $(this).hide();
                 break;
             default:
@@ -94,6 +74,26 @@
                 else $(this).hide();
             }
         });
+
+        // add change event callback
+        switch(self.itemChangeEvent)
+        {
+        case 'click': case 'dblclick': case 'hover':
+            $(self).on(self.itemChangeEvent, 'img', onChange);
+            break;
+        case '':
+            break;
+        default:
+            console.error("Wrong change event trigger!");
+            return undefined;
+        }
+
+        if (self.navigatorFor != null &&
+            self.navigatorFor.getElementNum() != m_gImgElements.length)
+        {
+            console.error("CANNOT assign self as navigator");
+            return undefined;
+        }
 
         // ==========================================
         // Private Functions
@@ -103,29 +103,46 @@
         {
             switch(self.animationType)
             {
-            case "slide":
+            case 'slide':
                 break;
-            case "popup":
+            case 'popup':
                 $(m_gImgElements).eq(m_nCurIndex).stop(true, true).delay(30).
                     hide(self.animationDuration);
                 $(m_gImgElements).eq(index).stop(true, true).show(self.animationDuration);
                 break;
-            case "fade":
+            case 'fade':
                 $(m_gImgElements).eq(m_nCurIndex).stop(true, true).delay(30).
                     fadeOut(self.animationDuration);
                 $(m_gImgElements).eq(index).stop(true, true).fadeIn(self.animationDuration);
                 break;
             default:
-                console.error("Unknown animation type!");
+                console.warn("Unknown animation type!");
             }
         }
 
         function setCurIndex(index)
         {
-            $(m_gImgElements).eq(m_nCurIndex).removeClass(self.selectedClass);
-            $(m_gImgElements).eq(index).addClass(self.selectedClass);
+            if ($(self).hidden)
+            {
+                $(self).show(self.initialDelay);
+            }
 
-            if (self.maxItems == 1 && self.animation) animate(index);
+            var gCurElement  = $(m_gImgElements).eq(m_nCurIndex);
+            var gNextElement = $(m_gImgElements).eq(index);
+
+            $(gCurElement).removeClass(self.selectedClass);
+            $(gNextElement).addClass(self.selectedClass);
+
+            if (self.maxItems == 1)
+            {
+                if (self.animation) animate(index);
+                else
+                {
+                    $(gCurElement).hide();
+                    $(gNextElement).show();
+                }
+            }
+
             m_nCurIndex = index;
         }
 
@@ -157,4 +174,4 @@
         return self;
     };
 
-}(jQuery)); // namespace JQuery
+}(jQuery)); // namespace jQuery
