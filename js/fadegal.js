@@ -42,6 +42,10 @@
         // Initialization & Error Checks
         // ==========================================
 
+        // if used as popup gallery then make sure everything is hidden
+        if (!self.alwaysVisible)
+            $(self).hide();
+
         if (!m_gImgElements.length)
         {
             console.error("NO image data! Please, come back later after you watch some porn!");
@@ -55,9 +59,18 @@
             return undefined;
         }
 
-        // if used as popup gallery then make sure everything is hidden
-        if (!self.alwaysVisible)
-            $(self).hide();
+        // add change event callback
+        switch(self.itemChangeEvent)
+        {
+        case 'click': case 'dblclick': case 'hover':
+            $(self).on(self.itemChangeEvent, 'img', onChange);
+            break;
+        case '':
+            break;
+        default:
+            console.error("Wrong change event trigger!");
+            return undefined;
+        }
 
         // correct positioning for the container
         if (self.maxItems == 1)
@@ -81,18 +94,6 @@
                 else $(this).hide();
             }
         });
-
-        // add change event callback
-        switch(self.itemChangeEvent)
-        {
-        case 'click': case 'dblclick': case 'hover':
-            $(self).on(self.itemChangeEvent, 'img', onChange);
-            break;
-        case '':
-            break;
-        default:
-            console.error("Wrong change event trigger!");
-        }
 
         // ==========================================
         // Private Functions
