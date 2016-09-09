@@ -27,33 +27,25 @@
         // merge all objects and allow the instance config to supercede the default one
         $.extend(this, default_config, config, { version: '1.0' });
 
-        var self         = this;
-        var gImgElements = $(self).find('img');
-        var nCurIndex    = 0;
+        var self           = this;
+        var m_gImgElements = $(self).find('img');
+        var m_nCurIndex    = 0;
 
         // ==========================================
-
-        self.getSelf = function()
-        {
-            return self;
-        }
-
-        self.getElementNum = function()
-        {
-            return gImgElements.length;
-        }
-
-        self.getElementFromIndex = function(index)
-        {
-            return $(gImgElements).eq(index);
-        }
-
+        // Public Functions
         // ==========================================
 
-        if (!gImgElements.length)
+        self.getElementNum       = function()      { return m_gImgElements.length; }
+        self.getElementFromIndex = function(index) { return $(m_gImgElements).eq(index); }
+
+        // ==========================================
+        // Initialization & Error Checks
+        // ==========================================
+
+        if (!m_gImgElements.length)
         {
             console.error("NO image data! Please, come back later after you watch some porn!");
-            return;
+            return undefined;
         }
 
         if (self.maxItems == 1)
@@ -63,7 +55,7 @@
         }
 
         // ensure proper initial visibility state
-        gImgElements.each(function(index)
+        m_gImgElements.each(function(index)
         {
             switch(self.maxItems)
             {
@@ -85,16 +77,26 @@
             $(self).hide();
 
         if (self.navigatorFor != null &&
-            self.navigatorFor.getElementNum() != gImgElements.length)
+            self.navigatorFor.getElementNum() != m_gImgElements.length)
         {
             console.error("CANNOT assign self as navigator");
-            return;
+            return undefined;
         }
 
         // add change event callback
-        if (self.itemChangeEvent.length)
+        switch(self.itemChangeEvent)
+        {
+        case 'click': case 'dblclick': case 'hover':
             $(self).on(self.itemChangeEvent, 'img', onChange);
+            break;
+        case '':
+            break;
+        default:
+            console.error("Wrong change event trigger!");
+        }
 
+        // ==========================================
+        // Private Functions
         // ==========================================
 
         function animate(index)
@@ -104,46 +106,49 @@
             case "slide":
                 break;
             case "popup":
-                $(gImgElements).eq(nCurIndex).stop(true, true).hide(self.animationDuration);
-                $(gImgElements).eq(index).stop(true, true).show(self.animationDuration);
+                $(m_gImgElements).eq(m_nCurIndex).stop(true, true).delay(30).
+                    hide(self.animationDuration);
+                $(m_gImgElements).eq(index).stop(true, true).show(self.animationDuration);
+                break;
+            case "fade":
+                $(m_gImgElements).eq(m_nCurIndex).stop(true, true).delay(30).
+                    fadeOut(self.animationDuration);
+                $(m_gImgElements).eq(index).stop(true, true).fadeIn(self.animationDuration);
                 break;
             default:
-                $(gImgElements).eq(nCurIndex).stop(true, true).fadeOut(self.animationDuration);
-                $(gImgElements).eq(index).stop(true, true).fadeIn(self.animationDuration);
+                console.error("Unknown animation type!");
             }
         }
 
         function setCurIndex(index)
         {
-            $(gImgElements).eq(nCurIndex).removeClass(self.selectedClass);
-            $(gImgElements).eq(index).addClass(self.selectedClass);
+            $(m_gImgElements).eq(m_nCurIndex).removeClass(self.selectedClass);
+            $(m_gImgElements).eq(index).addClass(self.selectedClass);
 
             if (self.maxItems == 1 && self.animation) animate(index);
-            nCurIndex = index;
+            m_nCurIndex = index;
         }
 
         function getElementIndex(element)
         {
-            for (var i = 0; i < gImgElements.length; ++i)
-                if ($(gImgElements).eq(i).is(element)) return i;
+            for (var i = 0; i < m_gImgElements.length; ++i)
+                if ($(m_gImgElements).eq(i).is(element)) return i;
 
             return 0;
         }
 
         function onChange(event)
         {
-            var nextIndex = getElementIndex(this);
+            var nNextIndex = getElementIndex(this);
 
-            if (nextIndex != self.nCurIndex)
+            if (nNextIndex != self.m_nCurIndex)
+                setCurIndex (nNextIndex);
+
+            // try to call the navigated object instance???
+            if (self.navigatorFor != null)
             {
-                setCurIndex (nextIndex);
-
-                // try to call the navigated object instance???
-                if (self.navigatorFor != null)
-                {
-                    $(self.navigatorFor.getElementFromIndex(nextIndex)).
-                        trigger(self.navigatorFor.itemChangeEvent, event);
-                }
+                $(self.navigatorFor.getElementFromIndex(nNextIndex)).
+                    trigger(self.navigatorFor.itemChangeEvent, event);
             }
 
             event.preventDefault();
