@@ -132,7 +132,6 @@
 
         function onChange(event)
         {
-            event.preventDefault();
             var nextIndex = getElementIndex(this);
 
             if (nextIndex != self.nCurIndex)
@@ -146,6 +145,8 @@
                         trigger(self.navigatorFor.itemChangeEvent, event);
                 }
             }
+
+            event.preventDefault();
         }
 
         return self;
