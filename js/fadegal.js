@@ -48,11 +48,20 @@
             return undefined;
         }
 
-        if (self.maxItems == 1)
+        if (self.navigatorFor != null &&
+            self.navigatorFor.getElementNum() != m_gImgElements.length)
         {
-            // correct positioning for the container
-            $(self).css("position", "relative");
+            console.error("CANNOT assign self as navigator");
+            return undefined;
         }
+
+        // if used as popup gallery then make sure everything is hidden
+        if (!self.alwaysVisible)
+            $(self).hide();
+
+        // correct positioning for the container
+        if (self.maxItems == 1)
+            $(self).css("position", "relative");
 
         // ensure proper initial visibility state
         m_gImgElements.each(function(index)
@@ -72,16 +81,6 @@
                 else $(this).hide();
             }
         });
-
-        if (!self.alwaysVisible)
-            $(self).hide();
-
-        if (self.navigatorFor != null &&
-            self.navigatorFor.getElementNum() != m_gImgElements.length)
-        {
-            console.error("CANNOT assign self as navigator");
-            return undefined;
-        }
 
         // add change event callback
         switch(self.itemChangeEvent)
