@@ -1,6 +1,4 @@
-// the short version of jquery $(document).ready
-$(function()
-{
+(function($) {
     // default configuration array
     var default_config =
     {
@@ -23,29 +21,48 @@ $(function()
         navigatorFor:      null
     };
 
-    // selfance constructor extending the jquery namespace
+    // instance constructor extending the jquery namespace
     $.fn.fadegal = function(config)
     {
-        // merge all selfects and allow the selfance config to supercede the default one
+        // merge all objects and allow the instance config to supercede the default one
         $.extend(this, default_config, config, { version: '1.0' });
 
         var self         = this;
         var gImgElements = $(self).find('img');
         var nCurIndex    = 0;
 
+        // ==========================================
+
+        self.getSelf = function()
+        {
+            return self;
+        }
+
+        self.getElementNum = function()
+        {
+            return gImgElements.length;
+        }
+
+        self.getElementFromIndex = function(index)
+        {
+            return $(gImgElements).eq(index);
+        }
+
+        // ==========================================
+
         if (!gImgElements.length)
         {
-            console.error("NO image data!");
+            console.error("NO image data! Please, come back later after you watch some porn!");
             return;
         }
 
-        // ensure proper initial visibility state
         if (self.maxItems == 1)
         {
             // correct positioning for the container
             $(self).css("position", "relative");
         }
 
+        // ensure proper initial visibility state
         gImgElements.each(function(index)
         {
             switch(self.maxItems)
@@ -67,7 +84,8 @@ $(function()
         if (!self.alwaysVisible)
             $(self).hide();
 
-        if (self.navigatorFor && self.navigatorFor.gImgElements.length != gImgElements.length)
+        if (self.navigatorFor != null &&
+            self.navigatorFor.getElementNum() != gImgElements.length)
         {
             console.error("CANNOT assign self as navigator");
             return;
@@ -77,6 +95,8 @@ $(function()
         if (self.itemChangeEvent.length)
             $(self).on(self.itemChangeEvent, 'img', onChange);
 
+        // ==========================================
+
         function animate(index)
         {
             switch(self.animationType)
@@ -84,12 +104,12 @@ $(function()
             case "slide":
                 break;
             case "popup":
-                $(gImgElements).eq(nCurIndex).hide(self.animationDuration);
-                $(gImgElements).eq(index).show(self.animationDuration);
+                $(gImgElements).eq(nCurIndex).stop(true, true).hide(self.animationDuration);
+                $(gImgElements).eq(index).stop(true, true).show(self.animationDuration);
                 break;
             default:
-                $(gImgElements).eq(nCurIndex).fadeOut(self.animationDuration);
-                $(gImgElements).eq(index).fadeIn(self.animationDuration * 2);
+                $(gImgElements).eq(nCurIndex).stop(true, true).fadeOut(self.animationDuration);
+                $(gImgElements).eq(index).stop(true, true).fadeIn(self.animationDuration);
             }
         }
 
@@ -98,7 +118,7 @@ $(function()
             $(gImgElements).eq(nCurIndex).removeClass(self.selectedClass);
             $(gImgElements).eq(index).addClass(self.selectedClass);
 
-            if(self.maxItems == 1 && self.animation) animate(3);
+            if (self.maxItems == 1 && self.animation) animate(index);
             nCurIndex = index;
         }
 
@@ -110,20 +130,25 @@ $(function()
             return 0;
         }
 
-        function onChange(e)
+        function onChange(event)
         {
-            e.preventDefault();
+            event.preventDefault();
+            var nextIndex = getElementIndex(this);
 
-            var nextIndex  = getElementIndex(this);
-            if (nextIndex == self.nCurIndex) return;
+            if (nextIndex != self.nCurIndex)
+            {
+                setCurIndex (nextIndex);
 
-            setCurIndex (nextIndex);
-
-            // try to call the navigated selfect instance???
-            if (self.navigatorFor != null)
-                self.navigatorFor.onChange(e);
+                // try to call the navigated object instance???
+                if (self.navigatorFor != null)
+                {
+                    $(self.navigatorFor.getElementFromIndex(nextIndex)).
+                        trigger(self.navigatorFor.itemChangeEvent, event);
+                }
+            }
         }
 
+        return self;
     };
 
-});
+}(jQuery)); // namespace JQuery
