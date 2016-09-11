@@ -7,7 +7,7 @@
         <link rel="stylesheet" type="text/css" href="css/fadegal.base.css">
     </head>
     <body>
-        <div class="slideshow"  id="preview-image">
+        <div class="slideshow" id="preview-image">
             <a href="#"><img class="selected" src="img/neuron.jpg"  title="Neuron"></a>
             <a href="#"><img src="img/batman.jpg" title="Batman"></a>
             <a href="#"><img src="img/cppual.jpg" title="CPPUAL"></a>
@@ -19,6 +19,15 @@
             <a href="#"><img src="img/cppual.jpg" title="CPPUAL"></a>
             <a href="#"><img src="img/mk.jpg" title="MK"></a>
         </div>
+        <div class="lightbox">
+            <button>Close [X]</button>
+            <div id="lightbox-gallery">
+                <a href="#"><img class="selected" src="img/neuron.jpg"  title="Neuron"></a>
+                <a href="#"><img src="img/batman.jpg" title="Batman"></a>
+                <a href="#"><img src="img/cppual.jpg" title="CPPUAL"></a>
+                <a href="#"><img src="img/mk.jpg" title="MK"></a>
+            </div>
+        </div>
         <div id="content"></div>
         <script
               src="https://code.jquery.com/jquery-3.1.0.min.js"
@@ -29,6 +38,11 @@
         <script type="text/javascript">
         $(function()
         {
+            $('.lightbox button').click(function()
+            {
+                $('.lightbox').fadeOut(500);
+            });
+
             var popup = $(".lightbox").fadegal(
             {
                 alwaysVisible:            false, // init as a popup gallery
@@ -36,15 +50,13 @@
                 animationDuration:        1000,
                 animationType:            "fade", // transitional animations: fade, slide
                 navigation:               true,
-                navPrevStyle:             "#prev",
-                prevText:                 'Previous',
-                navNextStyle:             "#next",
-                nextText:                 'Next',
-                itemChangeEvent:          "click", // click, hover, dblclick or empty string
+                navPrevStyle:             "#lightbox-prev",
+                navNextStyle:             "#lightbox-next"
             });
 
             var slideshow = $(".slideshow").fadegal(
             {
+                initialDelay:             2000,
                 animation:                true,
                 animationType:            "fade",
                 navigation:               false,

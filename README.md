@@ -1,5 +1,6 @@
 # Fadegal - Universal lightweight JavaScript Slider/Carousel/Gallery/Navigator #
 
+
 **Example Usage**
 ```
 #!html

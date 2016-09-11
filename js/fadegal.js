@@ -2,7 +2,7 @@
     // default configuration array
     var default_config =
     {
-        initialDelay:      400, // milliseconds
+        initialDelay:      600, // milliseconds
         initialEffect:     true, // play a first time show effect
         initialEffectType: 1, // effects: 1.FadeIn, 2.Popup, 3.SlideIn
         alwaysVisible:     true, // if always visible or it should popup like a gallery
@@ -14,10 +14,9 @@
         selectedClass:     "selected",
         navigation:        true,
         navPrevStyle:      "#prev",
-        prevText:          'Previous',
         navNextStyle:      "#next",
-        nextText:          'Next',
         itemChangeEvent:   "click", // click, hover, dblclick or empty string
+        itemTagName:       "img", // ex. tags: img, li, a
         navigatorFor:      null
     };
 
@@ -28,7 +27,7 @@
         $.extend(this, default_config, config, { version: '1.0' });
 
         var self           = this;
-        var m_gImgElements = $(self).find('img');
+        var m_gImgElements = $(self).find(self.itemTagName);
         var m_nCurIndex    = 0;
 
         // ==========================================
@@ -38,13 +37,24 @@
         self.getElementNum       = function()      { return m_gImgElements.length;       }
         self.getElementFromIndex = function(index) { return $(m_gImgElements).eq(index); }
 
+        self.activate = function ()
+        {
+            if ($(self).is(':hidden'))
+            {
+                if (self.initialEffect) $(self).fadeIn(self.initialDelay);
+                else setTimeout(function(){ $(self).show(); }, self.initialDelay);
+            }
+        }
+
         // ==========================================
         // Initialization & Error Checks
         // ==========================================
 
-        // if used as popup gallery then make sure everything is hidden
-        if (!self.alwaysVisible)
-            $(self).hide();
+        // hide everything on load to prepare for initialization
+        if ($(self).is(':visible')) $(self).hide();
+
+        // if NOT used as popup gallery then show the container in a delayed manner
+        if (self.alwaysVisible) self.activate();
 
         if (!m_gImgElements.length)
         {
@@ -53,7 +63,7 @@
         }
 
         // correct positioning for the container
-        if (self.maxItems == 1)
+        if (self.maxItems == 1 && self.alwaysVisible)
             $(self).css("position", "relative");
 
         // ensure proper initial visibility state
@@ -79,7 +89,7 @@
         switch(self.itemChangeEvent)
         {
         case 'click': case 'dblclick': case 'hover':
-            $(self).on(self.itemChangeEvent, 'img', onChange);
+            $(self).on(self.itemChangeEvent, self.itemTagName, onChange);
             break;
         case '':
             break;
@@ -122,11 +132,6 @@
 
         function setCurIndex(index)
         {
-            if ($(self).hidden)
-            {
-                $(self).show(self.initialDelay);
-            }
-
             var gCurElement  = $(m_gImgElements).eq(m_nCurIndex);
             var gNextElement = $(m_gImgElements).eq(index);
 
@@ -151,17 +156,17 @@
             for (var i = 0; i < m_gImgElements.length; ++i)
                 if ($(m_gImgElements).eq(i).is(element)) return i;
 
-            return 0;
+            return -1;
         }
 
         function onChange(event)
         {
             var nNextIndex = getElementIndex(this);
 
-            if (nNextIndex != self.m_nCurIndex)
-                setCurIndex (nNextIndex);
+            if (nNextIndex == self.m_nCurIndex) self.navigatorFor.activate();
+            else setCurIndex (nNextIndex);
 
-            // try to call the navigated object instance???
+            // call the navigated object instance
             if (self.navigatorFor != null)
             {
                 $(self.navigatorFor.getElementFromIndex(nNextIndex)).
