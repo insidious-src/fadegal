@@ -16,9 +16,7 @@ $(function()
         animationType:            "fade", // transitional animations: fade, slide
         navigation:               true,
         navPrevStyle:             "#prev",
-        prevText:                 'Previous',
         navNextStyle:             "#next",
-        nextText:                 'Next',
         itemChangeEvent:          "click", // click, hover, dblclick or empty string
     });
 
