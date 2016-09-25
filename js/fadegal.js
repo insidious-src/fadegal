@@ -15,7 +15,7 @@
         navigation:        true,
         navPrevStyle:      "#prev",
         navNextStyle:      "#next",
-        itemChangeEvent:   "click", // click, hover, dblclick or empty string
+        itemChangeEvent:   "click", // click, hover or dblclick
         itemTagName:       "img", // ex. tags: img, li, a
         navigatorFor:      null
     };
@@ -24,10 +24,10 @@
     $.fn.fadegal = function(config)
     {
         // merge all objects and allow the instance config to supercede the default one
-        $.extend(this, default_config, config, { version: '1.0' });
+        $.extend(this, default_config, config, { version: '1.4' });
 
         var self        = this;
-        var m_gTagArray = $(self).find(self.itemTagName); // find the matching local tags
+        var m_gTagArray = $(self).find(self.itemTagName); // find all matching local tags
         var m_nCurIndex = 0;
 
         // ==========================================
@@ -97,16 +97,14 @@
                 // register navigation event callback for previous
                 $(self.navPrevStyle).on(self.itemChangeEvent, function()
                 {
-                    $(m_gTagArray).eq(m_nCurIndex == 0 ? m_gTagArray.length - 1  :
-                                                         m_nCurIndex        - 1).
+                    $(m_gTagArray).eq((m_nCurIndex - 1) % m_gTagArray.length).
                         trigger(self.itemChangeEvent);
                 });
 
                 // register navigation event callback for next
                 $(self.navNextStyle).on(self.itemChangeEvent, function()
                 {
-                    $(m_gTagArray).eq(m_nCurIndex == (m_gTagArray.length - 1) ?
-                                                  0 : m_nCurIndex        + 1).
+                    $(m_gTagArray).eq((m_nCurIndex + 1) % m_gTagArray.length).
                         trigger(self.itemChangeEvent);
                 });
             }
@@ -118,8 +116,6 @@
                 $(m_gTagArray).eq(m_nCurIndex == (m_gTagArray.length - 1) ?
                                         0 : m_nCurIndex + 1), onChange);*/
             break;
-        case '':
-            break;
         default:
             console.error("Wrong change event trigger!");
             return undefined;
@@ -128,13 +124,13 @@
         if (self.navigatorFor != null &&
             self.navigatorFor.getElementNum() != m_gTagArray.length)
         {
-            console.error("CANNOT assign self as navigator");
-            return undefined;
+            self.navigatorFor = null;
+            console.warn("CANNOT assign self as navigator");
         }
 
         // ==========================================
         // Private Functions
-        // ==========================================
+        // ===================================m=======
 
         // TODO: reimplement the function as an universal animation handler
         function animate(index)

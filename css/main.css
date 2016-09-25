@@ -25,7 +25,7 @@ html, body
     width: 138px;
 }
 
-.lightbox
+#lightbox
 {
     background-color: rgba(0,0,0,0.95);
     position:         fixed;
@@ -39,7 +39,7 @@ html, body
     overflow-x:       hidden;
 }
 
-.lightbox button
+#lightbox button
 {
     margin-bottom: 25px;
 }

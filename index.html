@@ -19,13 +19,14 @@
             <a href="#"><img src="img/cppual.jpg" title="CPPUAL"></a>
             <a href="#"><img src="img/mk.jpg" title="MK"></a>
         </div>
-        <div class="lightbox">
-            <button>Close [X]</button>
+        <div id="lightbox">
             <div id="lightbox-gallery">
+                <div id="lightbox-prev"><a href="#">Prev</a></div>
                 <a href="#"><img class="selected" src="img/neuron.jpg"  title="Neuron"></a>
                 <a href="#"><img src="img/batman.jpg" title="Batman"></a>
                 <a href="#"><img src="img/cppual.jpg" title="CPPUAL"></a>
                 <a href="#"><img src="img/mk.jpg" title="MK"></a>
+                <div id="lightbox-next"><a href="#">Next</a></div>
             </div>
         </div>
         <div id="content"></div>
@@ -38,12 +39,13 @@
         <script type="text/javascript">
         $(function()
         {
-            $('.lightbox button').click(function()
+            $('#lightbox').click(function(event)
             {
-                $('.lightbox').fadeOut(500);
+                if(event.target == document.getElementById('lightbox'))
+                    $(this).fadeOut(500);
             });
 
-            var popup = $(".lightbox").fadegal(
+            var popup = $("#lightbox").fadegal(
             {
                 alwaysVisible:            false, // init as a popup gallery
                 animation:                true,
