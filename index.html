@@ -47,6 +47,7 @@
 
             var popup = $("#lightbox").fadegal(
             {
+                //initialEffect:            false,
                 alwaysVisible:            false, // init as a popup gallery
                 animation:                true,
                 animationDuration:        1000,
@@ -62,16 +63,18 @@
                 animation:                true,
                 animationType:            "fade",
                 navigation:               false,
-                navigatorFor:             popup
+                navigatorFor:             [popup]
             });
 
-            $(".thumbs").fadegal(
+            var thumbs = $(".thumbs").fadegal(
             {
                 animation:                false,
                 maxItems:                 0, // maximum visible items
                 navigation:               false,
-                navigatorFor:             slideshow
+                navigatorFor:             [slideshow]
             });
+
+            popup.connect(thumbs);
         });
         </script>
     </body>

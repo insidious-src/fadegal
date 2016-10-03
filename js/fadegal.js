@@ -1,10 +1,10 @@
 (function($) {
     // default configuration array
-    var default_config =
+    var fadegal_config =
     {
         initialDelay:      600, // milliseconds
         initialEffect:     true, // play a first time show effect
-        initialEffectType: 1, // effects: 1.FadeIn, 2.Popup, 3.SlideIn
+        initialEffectType: "fade", // effects: fade, slide, popup
         alwaysVisible:     true, // if always visible or it should popup like a gallery
 
         animation:         true,
@@ -17,17 +17,17 @@
         navNextStyle:      "#next",
         itemChangeEvent:   "click", // click, hover or dblclick
         itemTagName:       "img", // ex. tags: img, li, a
-        navigatorFor:      null
+        navigatorFor:      []
     };
 
     // instance constructor extending the jquery namespace
     $.fn.fadegal = function(config)
     {
         // merge all objects and allow the instance config to supercede the default one
-        $.extend(this, default_config, config, { version: '1.4' });
+        $.extend(this, fadegal_config, config, { version: '1.4' });
 
         var self        = this;
-        var m_gTagArray = $(self).find(self.itemTagName); // find all matching local tags
+        var m_gTagArray = self.find(self.itemTagName); // find all matching local tags
         var m_nCurIndex = 0;
 
         // ==========================================
@@ -37,11 +37,19 @@
         self.getElementNum       = function()      { return m_gTagArray.length;       }
         self.getElementFromIndex = function(index) { return $(m_gTagArray).eq(index); }
 
+        self.connect = function(object)
+        {
+            if (typeof(object) != typeof(self) || object.getElementNum() != m_gTagArray.length)
+                return false;
+            self.navigatorFor.push(object);
+            return true;
+        }
+
         self.activate = function ()
         {
             if ($(self).is(':hidden'))
             {
-                if (self.initialEffect) $(self).fadeIn(self.initialDelay);
+                if (self.initialEffect) animate(self.initialEffectType, self.initialDelay);
                 else setTimeout(function(){ $(self).show(); }, self.initialDelay);
             }
         }
@@ -51,7 +59,7 @@
         // ==========================================
 
         // hide everything on load to prepare for initialization
-        if ($(self).is(':visible')) $(self).hide();
+        if (self.is(':visible')) self.hide();
 
         // if NOT used as popup gallery then show the container in a delayed manner
         if (self.alwaysVisible) self.activate();
@@ -64,7 +72,7 @@
 
         // correct positioning for the container
         if (self.maxItems == 1 && self.alwaysVisible)
-            $(self).css("position", "relative");
+            self.css("position", "relative");
 
         // ensure proper initial visibility state
         m_gTagArray.each(function(index)
@@ -90,64 +98,61 @@
         {
         case 'click': case 'dblclick': case 'hover':
             // register item change event callback
-            $(self).on(self.itemChangeEvent, self.itemTagName, onChange);
+            self.on(self.itemChangeEvent, self.itemTagName, onIndexChange);
 
             if (self.navigation)
             {
                 // register navigation event callback for previous
                 $(self.navPrevStyle).on(self.itemChangeEvent, function()
                 {
-                    $(m_gTagArray).eq((m_nCurIndex - 1) % m_gTagArray.length).
+                    m_gTagArray.eq((m_nCurIndex - 1) % m_gTagArray.length).
                         trigger(self.itemChangeEvent);
                 });
 
                 // register navigation event callback for next
                 $(self.navNextStyle).on(self.itemChangeEvent, function()
                 {
-                    $(m_gTagArray).eq((m_nCurIndex + 1) % m_gTagArray.length).
+                    m_gTagArray.eq((m_nCurIndex + 1) % m_gTagArray.length).
                         trigger(self.itemChangeEvent);
                 });
             }
-
-            /*$(self.navPrevStyle).on(self.itemChangeEvent,
-                $(m_gTagArray).eq(m_nCurIndex == 0 ? m_gTagArray.length - 1  :
-                                                        m_nCurIndex - 1), onChange);
-            $(self.navNextStyle).on(self.itemChangeEvent,
-                $(m_gTagArray).eq(m_nCurIndex == (m_gTagArray.length - 1) ?
-                                        0 : m_nCurIndex + 1), onChange);*/
             break;
         default:
             console.error("Wrong change event trigger!");
             return undefined;
         }
 
-        if (self.navigatorFor != null &&
-            self.navigatorFor.getElementNum() != m_gTagArray.length)
+        for (var i = 0; i < self.navigatorFor.length; ++i)
         {
-            self.navigatorFor = null;
-            console.warn("CANNOT assign self as navigator");
+            if (self.navigatorFor[i].getElementNum() != m_gTagArray.length)
+                self.navigatorFor.splice(i, 1);
         }
 
         // ==========================================
         // Private Functions
-        // ===================================m=======
+        // ==========================================
 
-        // TODO: reimplement the function as an universal animation handler
-        function animate(index)
+        function animate(type, duration, index = -1)
         {
-            switch(self.animationType)
+            switch (type)
             {
-            case 'slide':
+            case 'fade':
+                if (index > -1)
+                {
+                    m_gTagArray.eq(index).stop(true, true).fadeIn(duration);
+                    m_gTagArray.eq(m_nCurIndex).stop(true, true).fadeOut(duration);
+                }
+                else self.stop(true, true).fadeIn(duration);
                 break;
             case 'popup':
-                $(m_gTagArray).eq(m_nCurIndex).stop(true, true).delay(30).
-                    hide(self.animationDuration);
-                $(m_gTagArray).eq(index).stop(true, true).show(self.animationDuration);
+                if (index > -1)
+                {
+                    m_gTagArray.eq(index).stop(true, true).show(duration);
+                    m_gTagArray.eq(m_nCurIndex).stop(true, true).hide(duration);
+                }
+                else self.stop(true, true).show(duration);
                 break;
-            case 'fade':
-                $(m_gTagArray).eq(m_nCurIndex).stop(true, true).delay(30).
-                    fadeOut(self.animationDuration);
-                $(m_gTagArray).eq(index).stop(true, true).fadeIn(self.animationDuration);
+            case 'slide':
                 break;
             default:
                 console.warn("Unknown animation type!");
@@ -164,7 +169,8 @@
 
             if (self.maxItems == 1)
             {
-                if (self.animation) animate(index);
+                if (self.animation)
+                    animate(self.animationType, self.animationDuration, index);
                 else
                 {
                     $(gCurElement ).hide();
@@ -175,20 +181,32 @@
             m_nCurIndex = index;
         }
 
-        function onChange(event)
+        function onIndexChange(event)
         {
-            var nNextIndex = $(m_gTagArray).index(this);
+            var nNextIndex = m_gTagArray.index(this);
 
-            if (self.navigatorFor != null)
+            if (self.navigatorFor.length)
             {
-                if (nNextIndex == m_nCurIndex) self.navigatorFor.activate();
+                if (nNextIndex == m_nCurIndex)
+                {
+                    for (var i = 0; i < self.navigatorFor.length; ++i)
+                        self.navigatorFor[i].activate();
+                }
                 else
                 {
+                    // avoid infinite loop
+                    var source = event.data;
+                    event.data = self;
+
                     setCurIndex(nNextIndex);
 
-                    // call the navigated object instance
-                    $(self.navigatorFor.getElementFromIndex(nNextIndex)).
-                        trigger(self.navigatorFor.itemChangeEvent, event);
+                    // call each navigated object instance
+                    for (var i = 0; i < self.navigatorFor.length; ++i)
+                    {
+                        if (source != self.navigatorFor[i])
+                            $(self.navigatorFor[i].getElementFromIndex(nNextIndex)).
+                                trigger(self.navigatorFor[i].itemChangeEvent, event);
+                    }
                 }
             }
             else if (nNextIndex != m_nCurIndex) setCurIndex(nNextIndex);

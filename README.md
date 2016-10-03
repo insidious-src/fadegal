@@ -13,11 +13,11 @@ $(function()
         alwaysVisible:            false, // init as a popup gallery
         animation:                true,
         animationDuration:        1000,
-        animationType:            "fade", // transitional animations: fade, slide
+        animationType:            "fade", // transitional animations: fade, slide, popup
         navigation:               true,
         navPrevStyle:             "#prev",
         navNextStyle:             "#next",
-        itemChangeEvent:          "click", // click, hover, dblclick or empty string
+        itemChangeEvent:          "click", // click, hover or dblclick
     });
 
     var slideshow = $(".slideshow").fadegal(
@@ -25,7 +25,7 @@ $(function()
         animation:                true,
         animationType:            "fade",
         navigation:               false,
-        navigatorFor:             popup
+        navigatorFor:             [popup]
     });
 
     $(".thumbs").fadegal(
@@ -33,7 +33,7 @@ $(function()
         animation:                false,
         maxItems:                 0, // maximum visible items
         navigation:               false,
-        navigatorFor:             slideshow
+        navigatorFor:             [slideshow]
     });
 });
 </script>
