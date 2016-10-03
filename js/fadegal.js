@@ -45,7 +45,7 @@
             return true;
         }
 
-        self.activate = function ()
+        self.activate = function()
         {
             if (self.is(':hidden'))
             {
@@ -161,11 +161,11 @@
 
         function setCurIndex(index)
         {
-            var gCurElement  = $(m_gTagArray).eq(m_nCurIndex);
-            var gNextElement = $(m_gTagArray).eq(index);
+            var gCurElement  = m_gTagArray.eq(m_nCurIndex);
+            var gNextElement = m_gTagArray.eq(index);
 
-            $(gCurElement ).removeClass(self.selectedClass);
-            $(gNextElement).addClass(self.selectedClass);
+            gCurElement .removeClass(self.selectedClass);
+            gNextElement.addClass(self.selectedClass);
 
             if (self.maxItems == 1)
             {
@@ -173,8 +173,8 @@
                     animate(self.animationType, self.animationDuration, index);
                 else
                 {
-                    $(gCurElement ).hide();
-                    $(gNextElement).show();
+                    gCurElement .hide();
+                    gNextElement.show();
                 }
             }
 
