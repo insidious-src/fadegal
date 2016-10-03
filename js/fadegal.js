@@ -47,10 +47,10 @@
 
         self.activate = function ()
         {
-            if ($(self).is(':hidden'))
+            if (self.is(':hidden'))
             {
                 if (self.initialEffect) animate(self.initialEffectType, self.initialDelay);
-                else setTimeout(function(){ $(self).show(); }, self.initialDelay);
+                else setTimeout(function(){ self.show(); }, self.initialDelay);
             }
         }
 
