@@ -27,19 +27,19 @@
         $.extend(this, fadegal_config, config, { version: '1.4' });
 
         var self        = this;
-        var m_gTagArray = self.find(self.itemTagName); // find all matching local tags
         var m_nCurIndex = 0;
+        var m_gTagArray = self.find(self.itemTagName); // find all matching local tags
 
         // ==========================================
         // Public Functions
         // ==========================================
 
-        self.getElementNum       = function()      { return m_gTagArray.length;       }
-        self.getElementFromIndex = function(index) { return $(m_gTagArray).eq(index); }
+        self.getElementNum       = function()      { return m_gTagArray.length;    }
+        self.getElementFromIndex = function(index) { return m_gTagArray.eq(index); }
 
         self.connect = function(object)
         {
-            if (typeof(object) != typeof(self) || object.getElementNum() != m_gTagArray.length)
+            if (typeof(object) != typeof(self) || object.getElementNum() != self.getElementNum())
                 return false;
             self.navigatorFor.push(object);
             return true;
@@ -64,7 +64,7 @@
         // if NOT used as popup gallery then show the container in a delayed manner
         if (self.alwaysVisible) self.activate();
 
-        if (!m_gTagArray.length)
+        if (!self.getElementNum())
         {
             console.error("NO image data!");
             return undefined;
@@ -105,14 +105,14 @@
                 // register navigation event callback for previous
                 $(self.navPrevStyle).on(self.itemChangeEvent, function()
                 {
-                    m_gTagArray.eq((m_nCurIndex - 1) % m_gTagArray.length).
+                    self.getElementFromIndex((m_nCurIndex - 1) % self.getElementNum()).
                         trigger(self.itemChangeEvent);
                 });
 
                 // register navigation event callback for next
                 $(self.navNextStyle).on(self.itemChangeEvent, function()
                 {
-                    m_gTagArray.eq((m_nCurIndex + 1) % m_gTagArray.length).
+                    self.getElementFromIndex((m_nCurIndex + 1) % self.getElementNum()).
                         trigger(self.itemChangeEvent);
                 });
             }
@@ -124,7 +124,7 @@
 
         for (var i = 0; i < self.navigatorFor.length; ++i)
         {
-            if (self.navigatorFor[i].getElementNum() != m_gTagArray.length)
+            if (self.navigatorFor[i].getElementNum() != self.getElementNum())
                 self.navigatorFor.splice(i, 1);
         }
 
@@ -139,16 +139,16 @@
             case 'fade':
                 if (index > -1)
                 {
-                    m_gTagArray.eq(index).stop(true, true).fadeIn(duration);
-                    m_gTagArray.eq(m_nCurIndex).stop(true, true).fadeOut(duration);
+                    self.getElementFromIndex(index).stop(true, true).fadeIn(duration);
+                    self.getElementFromIndex(m_nCurIndex).stop(true, true).fadeOut(duration);
                 }
                 else self.stop(true, true).fadeIn(duration);
                 break;
             case 'popup':
                 if (index > -1)
                 {
-                    m_gTagArray.eq(index).stop(true, true).show(duration);
-                    m_gTagArray.eq(m_nCurIndex).stop(true, true).hide(duration);
+                    self.getElementFromIndex(index).stop(true, true).show(duration);
+                    self.getElementFromIndex(m_nCurIndex).stop(true, true).hide(duration);
                 }
                 else self.stop(true, true).show(duration);
                 break;
@@ -161,8 +161,8 @@
 
         function setCurIndex(index)
         {
-            var gCurElement  = m_gTagArray.eq(m_nCurIndex);
-            var gNextElement = m_gTagArray.eq(index);
+            var gCurElement  = self.getElementFromIndex(m_nCurIndex);
+            var gNextElement = self.getElementFromIndex(index);
 
             gCurElement .removeClass(self.selectedClass);
             gNextElement.addClass(self.selectedClass);
