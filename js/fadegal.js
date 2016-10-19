@@ -24,7 +24,7 @@
     $.fn.fadegal = function(config)
     {
         // merge all objects and allow the instance config to supercede the default one
-        $.extend(this, fadegal_config, config, { version: '1.4' });
+        $.extend(this, fadegal_config, config, { version: '1.5' });
 
         var self        = this;
         var m_nCurIndex = 0;
@@ -36,6 +36,18 @@
 
         self.getElementNum       = function()      { return m_gTagArray.length;    }
         self.getElementFromIndex = function(index) { return m_gTagArray.eq(index); }
+
+        self.prev = function()
+        {
+            self.getElementFromIndex((m_nCurIndex - 1) % self.getElementNum()).
+                        trigger(self.itemChangeEvent);
+        }
+
+        self.next = function()
+        {
+            self.getElementFromIndex((m_nCurIndex + 1) % self.getElementNum()).
+                        trigger(self.itemChangeEvent);
+        }
 
         self.connect = function(object)
         {
@@ -83,7 +95,7 @@
                 $(this).show();
                 break;
             case 1:
-                $(this).css({ "position": "absolute", "top": "0px", "left": "0px" });
+                $(this).css({ "position": "absolute" });
                 if (index == m_nCurIndex) $(this).show();
                 else $(this).hide();
                 break;
@@ -103,18 +115,10 @@
             if (self.navigation)
             {
                 // register navigation event callback for previous
-                $(self.navPrevStyle).on(self.itemChangeEvent, function()
-                {
-                    self.getElementFromIndex((m_nCurIndex - 1) % self.getElementNum()).
-                        trigger(self.itemChangeEvent);
-                });
+                $(self.navPrevStyle).on(self.itemChangeEvent, self.prev);
 
                 // register navigation event callback for next
-                $(self.navNextStyle).on(self.itemChangeEvent, function()
-                {
-                    self.getElementFromIndex((m_nCurIndex + 1) % self.getElementNum()).
-                        trigger(self.itemChangeEvent);
-                });
+                $(self.navNextStyle).on(self.itemChangeEvent, self.next);
             }
             break;
         default:
