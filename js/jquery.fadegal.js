@@ -36,20 +36,13 @@
         // Public Functions
         // ==========================================
 
-        self.getElementNum       = function()      { return m_gTagArray.length;    }
-        self.getElementFromIndex = function(index) { return m_gTagArray.eq(index); }
+        self.getElementNum       = function()      { return m_gTagArray.length;    };
+        self.getElementFromIndex = function(index) { return m_gTagArray.eq(index); };
 
-        self.prev = function()
+        self.switchTo = function(index)
         {
-            self.getElementFromIndex((m_nCurIndex - 1) % self.getElementNum()).
-                        trigger(self.itemChangeEvent);
-        }
-
-        self.next = function()
-        {
-            self.getElementFromIndex((m_nCurIndex + 1) % self.getElementNum()).
-                        trigger(self.itemChangeEvent);
-        }
+            self.getElementFromIndex(index % self.getElementNum()).trigger(self.itemChangeEvent);
+        };
 
         self.connect = function(object)
         {
@@ -57,7 +50,7 @@
                 return false;
             self.navigatorFor.push(object);
             return true;
-        }
+        };
 
         self.activate = function()
         {
@@ -66,7 +59,7 @@
                 if (self.initialEffect) animate(self.initialEffectType, self.initialDelay);
                 else setTimeout(function(){ self.show(); }, self.initialDelay);
             }
-        }
+        };
 
         // ==========================================
         // Initialization & Error Checks
@@ -122,11 +115,11 @@
             {
                 // register navigation event callback for previous
                 $(self.navPrevStyle).on(self.itemChangeEvent, function(e)
-                { self.prev(); e.preventDefault(); });
+                { self.switchTo(m_nCurIndex - 1); e.preventDefault(); });
 
                 // register navigation event callback for next
                 $(self.navNextStyle).on(self.itemChangeEvent, function(e)
-                { self.next(); e.preventDefault(); });
+                { self.switchTo(m_nCurIndex + 1); e.preventDefault(); });
             }
             break;
         default:
@@ -231,7 +224,7 @@
             {
                 if (nNextIndex == m_nCurIndex)
                 {
-                    for (var i = 0; i < self.navigatorFor.length; ++i)
+                    for (i = 0; i < self.navigatorFor.length; ++i)
                         self.navigatorFor[i].activate();
                 }
                 else
@@ -243,7 +236,7 @@
                     setCurIndex(nNextIndex);
 
                     // call each navigated object instance
-                    for (var i = 0; i < self.navigatorFor.length; ++i)
+                    for (i = 0; i < self.navigatorFor.length; ++i)
                     {
                         if (source != self.navigatorFor[i])
                             $(self.navigatorFor[i].getElementFromIndex(nNextIndex)).
